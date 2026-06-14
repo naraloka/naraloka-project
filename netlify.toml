@@ -1,0 +1,44 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/midtrans/token"
+  to = "/.netlify/functions/midtrans-token"
+  status = 200
+
+[[redirects]]
+  from = "/api/midtrans/status"
+  to = "/.netlify/functions/midtrans-status"
+  status = 200
+
+[[redirects]]
+  from = "/api/midtrans/webhook"
+  to = "/.netlify/functions/midtrans-webhook"
+  status = 200
+
+[[redirects]]
+  from = "/api/royalty/membership-sync"
+  to = "/.netlify/functions/membership-royalty-sync"
+  status = 200
+
+[[redirects]]
+  from = "/api/reader/file-url"
+  to = "/.netlify/functions/reader-file-url"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/users"
+  to = "/.netlify/functions/admin-users"
+  status = 200
+
+[[redirects]]
+  from = "/api/platform-commission-settings"
+  to = "/.netlify/functions/platform-commission-settings"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

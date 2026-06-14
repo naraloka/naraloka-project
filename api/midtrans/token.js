@@ -1,0 +1,49 @@
+import { createMidtransTransaction } from "../../server/midtrans.js";
+import { requireAuthenticatedUser } from "../../server/auth.js";
+import { resolveTrustedCheckoutPayload } from "../../server/checkoutSecurity.js";
+
+function getJsonBody(req) {
+  if (req.body && typeof req.body === "object") return Promise.resolve(req.body);
+
+  return new Promise((resolve, reject) => {
+    let raw = "";
+
+    req.on("data", (chunk) => {
+      raw += chunk;
+    });
+
+    req.on("end", () => {
+      try {
+        resolve(raw ? JSON.parse(raw) : {});
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+    req.on("error", reject);
+  });
+}
+
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
+  }
+
+  try {
+    const body = await getJsonBody(req);
+    const authUser = await requireAuthenticatedUser(req.headers, process.env);
+    const trustedPayload = await resolveTrustedCheckoutPayload(
+      {
+        ...body,
+        authUser,
+      },
+      process.env
+    );
+    const result = await createMidtransTransaction(trustedPayload, process.env);
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      message: error.message || "Gagal membuat token Midtrans.",
+    });
+  }
+}
